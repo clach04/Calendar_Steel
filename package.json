@@ -1,0 +1,37 @@
+{
+    "author": "FC STUDIO",
+    "dependencies": {},
+    "keywords": [],
+    "name": "calendar-steel",
+    "pebble": {
+        "displayName": "Calendar Steel",
+        "enableMultiJS": false,
+        "messageKeys": [],
+        "projectType": "native",
+        "resources": {
+            "media": [
+                {
+                    "file": "images/MenuIcon.png",
+                    "memoryFormat": "1Bit",
+                    "menuIcon": true,
+                    "name": "MENU_ICON",
+                    "targetPlatforms": null,
+                    "type": "bitmap"
+                }
+            ]
+        },
+        "sdkVersion": "3",
+        "targetPlatforms": [
+            "aplite",
+            "basalt",
+            "chalk",
+            "diorite",
+            "emery"
+        ],
+        "uuid": "881c4e1e-f037-4a3c-8904-d013fee4215e",
+        "watchapp": {
+            "watchface": false
+        }
+    },
+    "version": "1.2.0"
+}

@@ -33,19 +33,21 @@ static const int WEEK_LABELS_HEGHT = 10;
 static const int DAY_WIDTH = 20;
 static const int DAY_OFFSET_X = 3;
 static const int CURRENT_DAY_RADIUS = 10;
-static const int HEADER_CORNER_RADIUS = 5;
+static const int HEADER_CORNER_RADIUS = 7;
 
 #if defined(PBL_RECT)
 static const int START_X = 0;
-static const int HEADER_HEIGHT = 45;
-static const int WEEK_LABELS_OFFSET_Y = 26;
-static const int TITLE_OFFSET = -2;
-static const int DAY_OFFSET_Y = 43;
+static const int HEADER_HEIGHT = 17;
+static const int HEADER_Y_OFFSET = 28;
+static const int WEEK_LABELS_OFFSET_Y = 24;
+static const int TITLE_OFFSET = -4;
+static const int DAY_OFFSET_Y = 45;
 static const int DAY_HEIGHT = 20;
 static const int DAY_CIRCLE_OFFSET = 2;
 #elif defined(PBL_ROUND)
 static const int START_X = 18;
 static const int HEADER_HEIGHT = 45;
+static const int HEADER_Y_OFFSET = 0;
 static const int WEEK_LABELS_OFFSET_Y = 26;
 static const int TITLE_OFFSET = 0;
 static const int DAY_OFFSET_Y = 43;
@@ -54,16 +56,19 @@ static const int DAY_CIRCLE_OFFSET = 3;
 #endif
 
 static const char * TITLE_FONT_KEY = FONT_KEY_GOTHIC_24_BOLD;
-static const char * WEEK_LABEL_FONT_KEY = FONT_KEY_GOTHIC_14;
-static const char * DAY_FONT_KEY = FONT_KEY_GOTHIC_18;
-static uint8_t header_color = GColorLightGrayARGB8;
-static uint8_t title_color = GColorRedARGB8;
-static uint8_t sat_sun_color = GColorDarkGrayARGB8;
+static const char * WEEK_LABEL_FONT_KEY = FONT_KEY_GOTHIC_18_BOLD;
+static const char * DAY_FONT_KEY = FONT_KEY_GOTHIC_18_BOLD;
+static const char * DAY_OTHER_FONT_KEY = FONT_KEY_GOTHIC_18;
+
+
+static uint8_t header_color = GColorWhiteARGB8;
+static uint8_t title_color = GColorWhiteARGB8;
+static uint8_t sat_sun_color = GColorBlackARGB8;
 static uint8_t week_day_color = GColorBlackARGB8;
-static uint8_t day_color = GColorBlackARGB8;
-static uint8_t current_day_color = GColorVeryLightBlueARGB8;
-static uint8_t current_day_text_color = GColorWhiteARGB8;
-static uint8_t other_month_day_color = GColorLightGrayARGB8;
+static uint8_t day_color = GColorWhiteARGB8;
+static uint8_t current_day_color = GColorWhiteARGB8;
+static uint8_t current_day_text_color = GColorBlackARGB8;
+static uint8_t other_month_day_color = GColorWhiteARGB8;
 
 static uint8_t is_euro = 0;
 
@@ -97,7 +102,7 @@ static void draw_month(Layer * layer, GContext * ctx, int offset_y, struct tm cu
   
   // draw header
   graphics_context_set_fill_color(ctx, (GColor)header_color);
-  graphics_fill_rect(ctx, GRect(bounds.origin.x, offset_y + bounds.origin.y, bounds.size.w, HEADER_HEIGHT), HEADER_CORNER_RADIUS, GCornersAll);
+  graphics_fill_rect(ctx, GRect(bounds.origin.x, offset_y + bounds.origin.y+HEADER_Y_OFFSET, bounds.size.w, HEADER_HEIGHT), HEADER_CORNER_RADIUS, GCornersAll);
   graphics_context_set_text_color(ctx, (GColor)title_color);
   graphics_draw_text(ctx, title, fonts_get_system_font(TITLE_FONT_KEY), GRect(bounds.origin.x, offset_y + bounds.origin.y + TITLE_OFFSET, bounds.size.w, TITLE_HEIGHT), GTextOverflowModeFill, GTextAlignmentCenter, NULL);
   
@@ -132,7 +137,15 @@ static void draw_month(Layer * layer, GContext * ctx, int offset_y, struct tm cu
     char day[MAX_DAY_LEN] = {'\0'};
     snprintf(day, MAX_DAY_LEN, "%d", day_to_draw.tm_mday);
     GRect location = GRect(START_X + DAY_OFFSET_X + wday_index * DAY_WIDTH, offset_y + DAY_OFFSET_Y + current_row * DAY_HEIGHT, DAY_WIDTH, DAY_HEIGHT);
-    graphics_draw_text(ctx, day, fonts_get_system_font(DAY_FONT_KEY), location, GTextOverflowModeFill, GTextAlignmentCenter, NULL);
+    
+    if(day_to_draw.tm_mon != current_tm.tm_mon)
+    {
+      graphics_draw_text(ctx, day, fonts_get_system_font(DAY_OTHER_FONT_KEY), location, GTextOverflowModeFill, GTextAlignmentCenter, NULL);
+    }
+    else
+    {
+      graphics_draw_text(ctx, day, fonts_get_system_font(DAY_FONT_KEY), location, GTextOverflowModeFill, GTextAlignmentCenter, NULL);
+    }
     
     if(wday_index == SATURDAY_INDEX) ++current_row;
     next_day_of_month();
@@ -157,7 +170,10 @@ static void update_proc(Layer * layer, GContext * ctx){
 }
   
 static void main_window_load(Window * window){
+  
+  window_set_background_color(window, GColorBlack);
   Layer * window_layer = window_get_root_layer(window);
+
   GRect bounds = layer_get_bounds(window_layer);
   main_layer = layer_create(bounds);
   layer_set_update_proc(main_layer, update_proc);
